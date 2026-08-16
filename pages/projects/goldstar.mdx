@@ -1,0 +1,40 @@
+---
+
+title: GoldStar
+date: 2026-08-15
+----------------
+
+# GoldStar
+
+## Personalized Live Event Recommendation
+
+GoldStar was my first role as a Data Scientist, and my biggest project was building a recommender system for them. Think 'Netflix problem', but adapted for live events.
+
+Unfortunately, GoldStar was an event sales company and did not survive the pandemic, but I was given permission to share a stripped down version of the code publically.
+
+The demonstration project uses the **MovieLens dataset** to demonstrate the code in a notebook enviornment, but some of the big features I added such as memory downscaling, snapshot saving and loading, and busienss logic contraints are not apparent in this demo.
+
+## Interactive Demo on Google Colab
+
+**[Launch the interactive demo →](https://colab.research.google.com/drive/1oAq1cGgo7XttF0Zpgr55zF8gtT4VdNEE?usp=sharing)**
+
+## Approach
+
+The project strustures the input data as user-item pairs, and generates features based on items and users, as well as previous user-item interactions. The model then learns embedding that represent each user's preferences and expands those preferences to build recommendations for each user.
+
+The recommendation pipeline includes:
+
+* Preparing and exploring the MovieLens ratings data
+* Representing user–movie interactions
+* Learning patterns in user preferences
+* Generating personalized movie recommendations
+* Evaluating recommendation quality
+
+## Technologies
+
+**Python** · **Pandas** · **NumPy** · **scikit-learn** · **Recommendation Systems** · **Collaborative Filtering** · **MovieLens**
+
+## Project Links
+
+* **[Interactive Colab Demo →](https://colab.research.google.com/drive/1oAq1cGgo7XttF0Zpgr55zF8gtT4VdNEE?usp=sharing)**
+* **[GitHub Repository →](https://github.com/macfarll/TransFM)**
