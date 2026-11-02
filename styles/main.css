@@ -1,11 +1,13 @@
 :root {
-  --accent: #2563eb;
-  --accent-hover: #1d4ed8;
-  --muted: #64748b;
-  --border: #e2e8f0;
+  color-scheme: dark;
+  --accent: #60a5fa;
+  --accent-hover: #93c5fd;
+  --muted: #94a3b8;
+  --border: #334155;
 }
 
 body {
+  color: #e2e8f0;
   background:
     radial-gradient(
       circle at 20% 20%,
@@ -19,6 +21,25 @@ body {
     ),
     #050505;
   background-attachment: fixed;
+}
+
+article.nx-prose {
+  --tw-prose-body: #d1d5db;
+  --tw-prose-headings: #f3f4f6;
+  --tw-prose-lead: #cbd5e1;
+  --tw-prose-links: #60a5fa;
+  --tw-prose-bold: #f8fafc;
+  --tw-prose-counters: #94a3b8;
+  --tw-prose-bullets: #94a3b8;
+  --tw-prose-hr: #334155;
+  --tw-prose-quotes: #e2e8f0;
+  --tw-prose-quote-borders: #334155;
+  --tw-prose-captions: #94a3b8;
+  --tw-prose-code: #f8fafc;
+  --tw-prose-pre-code: #e5e7eb;
+  --tw-prose-pre-bg: #111827;
+  --tw-prose-th-borders: #475569;
+  --tw-prose-td-borders: #334155;
 }
 
 a {
@@ -44,7 +65,7 @@ article h3 {
 }
 
 article strong {
-  color: #1e293b;
+  color: #f8fafc;
 }
 
 /* Project links */
@@ -65,13 +86,13 @@ footer {
 
 .portfolio-nav a {
   text-decoration: none;
-  color: #64748b;
+  color: var(--muted);
   font-size: 0.9rem;
   transition: color 0.2s ease;
 }
 
 .portfolio-nav a:hover {
-  color: #a78bfa;
+  color: var(--accent-hover);
 }
 
 /* Hide the duplicate name in the Nextra navbar */

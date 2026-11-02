@@ -1,0 +1,261 @@
+
+
+```{python}
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+from sklearn.linear_model import LinearRegression
+
+# --------------------------------------------------
+# Example: one ZIP code's monthly totals
+# --------------------------------------------------
+# Replace this with your actual data
+monthly = pd.DataFrame({
+    "month": np.arange(1, 13),
+    "total": [
+        120, 110, 105, 100, 115, 140,
+        165, 180, 175, 155, 140, 130
+    ]
+})
+
+monthly = pd.read_csv('../project-workbook-hayden_logan_m/shared_data/monthly_solar.csv')
+
+```
+
+```{python}
+monthly
+```
+
+```{python}
+
+# Month as 0-11 for the Fourier representation
+t = monthly["month"].values - 1
+
+# --------------------------------------------------
+# Fit one annual sine wave
+# --------------------------------------------------
+X = np.column_stack([
+    np.ones(len(t)),
+    np.cos(2 * np.pi * t / 12),
+    np.sin(2 * np.pi * t / 12)
+])
+
+model = LinearRegression(fit_intercept=False)
+model.fit(X, monthly["total"])
+
+beta0, beta_cos, beta_sin = model.coef_
+
+# Fitted values
+monthly["fit"] = model.predict(X)
+
+# --------------------------------------------------
+# Convert coefficients into interpretable features
+# --------------------------------------------------
+amplitude = np.sqrt(beta_cos**2 + beta_sin**2)
+
+# Phase / location of peak
+phase = np.arctan2(beta_sin, beta_cos)
+
+# Month corresponding approximately to peak
+peak_month = (phase * 12 / (2 * np.pi)) % 12
+peak_month = peak_month + 1
+
+# R²
+r2 = model.score(X, monthly["total"])
+
+print("Fourier features")
+print("----------------")
+print(f"Baseline:     {beta0:.2f}")
+print(f"Cosine:       {beta_cos:.2f}")
+print(f"Sine:         {beta_sin:.2f}")
+print(f"Amplitude:    {amplitude:.2f}")
+print(f"Peak month:   {peak_month:.2f}")
+print(f"R²:           {r2:.3f}")
+
+# --------------------------------------------------
+# Plot
+# --------------------------------------------------
+plt.figure(figsize=(10, 5))
+
+plt.plot(
+    monthly["month"],
+    monthly["total"],
+    marker="o",
+    label="Actual monthly totals"
+)
+
+plt.plot(
+    monthly["month"],
+    monthly["fit"],
+    marker="o",
+    linestyle="--",
+    label="Fitted seasonal wave"
+)
+
+plt.xticks(range(1, 13))
+plt.xlabel("Month")
+plt.ylabel("Total")
+plt.title("Monthly Seasonality and Fourier Fit")
+plt.legend()
+plt.grid(alpha=0.25)
+
+plt.show()
+
+```
+
+```{python}
+monthly[monthly['Zip Code'] == 97201]
+```
+
+```{python}
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+
+# --------------------------------------------------
+# Select one ZIP code
+# --------------------------------------------------
+zip_data = monthly.loc[monthly["Zip Code"] == 97201].iloc[0]
+
+# Monthly columns in calendar order
+months = ["jan", "feb", "mar", "apr", "may", "jun",
+          "jul", "aug", "sep", "oct", "nov", "dec"]
+
+values = np.array([
+    zip_data[f"solrad_{month}"] for month in months
+], dtype=float)
+
+# --------------------------------------------------
+# Fit one annual Fourier/sine wave
+# --------------------------------------------------
+t = np.arange(12)
+
+X = np.column_stack([
+    np.ones(12),
+    np.cos(2 * np.pi * t / 12),
+    np.sin(2 * np.pi * t / 12)
+])
+
+model = LinearRegression(fit_intercept=False)
+model.fit(X, values)
+
+beta0, beta_cos, beta_sin = model.coef_
+
+# --------------------------------------------------
+# Smooth fitted curve
+# --------------------------------------------------
+t_smooth = np.linspace(0, 12, 300)
+
+y_smooth = (
+    beta0
+    + beta_cos * np.cos(2 * np.pi * t_smooth / 12)
+    + beta_sin * np.sin(2 * np.pi * t_smooth / 12)
+)
+
+# --------------------------------------------------
+# Fourier features
+# --------------------------------------------------
+amplitude = np.sqrt(beta_cos**2 + beta_sin**2)
+phase = np.arctan2(beta_sin, beta_cos)
+
+r2 = model.score(X, values)
+
+print(f"ZIP Code: 97003")
+print()
+print("Fourier features")
+print("----------------")
+print(f"Baseline (β₀):  {beta0:.4f}")
+print(f"Cosine (βc):    {beta_cos:.4f}")
+print(f"Sine (βs):       {beta_sin:.4f}")
+print(f"Amplitude:       {amplitude:.4f}")
+print(f"Phase:            {phase:.4f}")
+print(f"R²:               {r2:.4f}")
+
+# --------------------------------------------------
+# Plot
+# --------------------------------------------------
+fig, ax = plt.subplots(figsize=(10, 5))
+
+# Actual monthly values
+ax.bar(
+    months,
+    values,
+    alpha=0.6,
+    label="Actual monthly totals"
+)
+
+# Smooth Fourier fit
+ax.plot(
+    t_smooth / 12 * 12,  # keep x-axis in month positions
+    y_smooth,
+    linewidth=2.5,
+    label="Fitted seasonal wave"
+)
+
+ax.set_xticks(t)
+ax.set_xticklabels(months)
+
+#ax.set_xlabel("Month")
+ax.set_ylabel("Solar radiation (kWh/m²/day)")
+ax.set_title("Portland, OR (97201) — Monthly Seasonality")
+ax.legend()
+
+feature_text = (
+    f"Baseline = {baseline:.2f}\n"
+    f"Amplitude = {amplitude:.2f}\n"
+    f"Phase = {phase:.2f}\n"
+    f"R² = {r2:.3f}"
+)
+
+ax.text(
+    0.02, 0.97,
+    feature_text,
+    transform=ax.transAxes,
+    verticalalignment="top",
+    bbox=dict(boxstyle="round", facecolor="white", alpha=0.8)
+)
+
+plt.tight_layout()
+plt.show()
+```
+
+
+```{python}
+# --------------------------------------------------
+# Convert Fourier coefficients to
+# baseline, amplitude, and phase
+# --------------------------------------------------
+baseline = beta0
+
+amplitude = np.sqrt(beta_cos**2 + beta_sin**2)
+
+phase = np.arctan2(beta_cos, beta_sin)
+
+# --------------------------------------------------
+# Smooth fitted sine wave
+# --------------------------------------------------
+t_smooth = np.linspace(0, 12, 300)
+
+y_smooth = (
+    baseline
+    + amplitude * np.sin(
+        2 * np.pi * t_smooth / 12 + phase
+    )
+)
+
+# --------------------------------------------------
+# Features
+# --------------------------------------------------
+r2 = model.score(X, values)
+
+print(f"ZIP Code: 97003")
+print()
+print("Seasonality features")
+print("--------------------")
+print(f"Baseline:   {baseline:.4f}")
+print(f"Amplitude:  {amplitude:.4f}")
+print(f"Phase:      {phase:.4f} radians")
+print(f"R²:         {r2:.4f}")
+```
